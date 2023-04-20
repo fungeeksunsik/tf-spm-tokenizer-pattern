@@ -53,5 +53,14 @@ def run_train():
     train.train_and_save_tokenizer(config.SPM_TRAINER_CONFIG)
 
 
+@app.command(
+    "evaluate",
+    help=""
+)
+def run_evaluate():
+    logger.info("Load sentencepiece tokenizer as Tensorflow layer")
+
+
+
 if __name__ == "__main__":
     app()
