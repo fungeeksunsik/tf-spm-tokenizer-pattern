@@ -4,6 +4,8 @@ import pathlib
 import config
 import preprocess
 import train
+import evaluate
+
 from typer import Typer
 
 
@@ -55,11 +57,24 @@ def run_train():
 
 @app.command(
     "evaluate",
-    help=""
+    help="Process for evaluating Keras layer that utilizes trained tokenizer"
 )
 def run_evaluate():
     logger.info("Load sentencepiece tokenizer as Tensorflow layer")
+    tokenize_layer = evaluate.SentencepieceTokenizerLayer()
 
+    dummy_texts = [
+        "You'll see that CAPITAL letters in the review",
+        "is INDEED converted into lowercase letters,",
+        "texts are normalized and eos, bos tokens are added."
+    ]
+    logger.info("Apply text tokenization on dummy texts")
+    for text in dummy_texts:
+        evaluate.print_tokenize_result(text, tokenize_layer)
+
+    logger.info("Apply text tokenization with padding")
+    for text in dummy_texts:
+        evaluate.print_tokenize_result(text, tokenize_layer, max_len=20)
 
 
 if __name__ == "__main__":

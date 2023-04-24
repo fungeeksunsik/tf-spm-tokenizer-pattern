@@ -1,3 +1,5 @@
+from typing import Optional
+
 import tensorflow as tf
 import tensorflow_text as tft
 import numpy as np
@@ -39,6 +41,28 @@ class SentencepieceTokenizerLayer(tf.keras.layers.Layer):
             self.tokenizer.tokenize(x)  # ragged tensor
             .to_tensor(config.SPM_TRAINER_CONFIG["pad_id"])  # 0-filled square tensor
         )
+
+
+def print_tokenize_result(
+    text: str,
+    tokenize_layer: SentencepieceTokenizerLayer,
+    max_len: Optional[int] = None,
+):
+    result = tokenize_layer(tf.constant([text]))
+    if max_len is None:
+        result = result.numpy()
+    else:
+        result = postprocess_tensor(result, max_len)
+    result = [
+        (
+            tokenize_layer.tokenizer
+            .id_to_string(token_id)  # <tf.Tensor: shape=(), dtype=string, numpy=b'\xe2\x96\x81you'>
+            .numpy()                 # b'\xe2\x96\x81you'
+            .decode("utf-8")         # '_you'
+        )
+        for token_id in result[0]    # result is 2-dimensional since input text was wrapped in list
+    ]
+    print(f"{text} -> {result}")
 
 
 def postprocess_tensor(x: tf.Tensor, max_len: int) -> np.array:
